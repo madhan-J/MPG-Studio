@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>MPG Studio</title>
+<style>
+@property --h{syntax:'<number>';inherits:true;initial-value:265}
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{--h:265;margin:0;min-height:100vh;color:#eef0ff;background:#07070f;font-family:"Segoe UI",system-ui,-apple-system,sans-serif;transition:--h 1s ease;
+--ac:hsl(var(--h) 95% 62%);--ac2:hsl(calc(var(--h) + 50) 95% 60%);--glow:hsl(var(--h) 95% 55% / .35)}
+body::before{content:"";position:fixed;inset:0;z-index:-2;background:radial-gradient(60% 50% at 15% 10%,hsl(var(--h) 90% 30% / .55),transparent),radial-gradient(50% 50% at 90% 90%,hsl(calc(var(--h) + 60) 90% 28% / .5),transparent)}
+#fx{position:fixed;inset:0;z-index:-1;width:100%;height:100%}
+main{max-width:1040px;margin:0 auto;padding:22px 16px 50px}
+.steps{display:flex;gap:8px;flex-wrap:wrap;font-size:13px}
+.chip{padding:5px 12px;border-radius:99px;border:1px solid #ffffff22;color:#9aa0c8;transition:.5s}
+.chip.on{color:#fff;border-color:var(--ac);box-shadow:0 0 18px var(--glow);background:#ffffff0d}
+h1{font-size:clamp(30px,6vw,56px);margin:14px 0 4px;letter-spacing:-1px;background:linear-gradient(90deg,var(--ac),var(--ac2));-webkit-background-clip:text;background-clip:text;color:transparent;min-height:1.2em;font-variant-numeric:tabular-nums}
+.sub{color:#aab0d8;margin:0 0 22px;min-height:1.5em}
+.grid{display:grid;grid-template-columns:1fr 1.15fr;gap:18px}
+@media(max-width:820px){.grid{grid-template-columns:1fr}}
+.card{background:#ffffff0c;border:1px solid #ffffff1c;border-radius:18px;padding:18px;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);box-shadow:0 0 40px -12px var(--glow);transition:box-shadow 1s}
+.card h2{font-size:15px;margin:0 0 12px;letter-spacing:.12em;text-transform:uppercase;color:#c9cdf5}
+#drop{border:2px dashed #ffffff40;border-radius:14px;padding:26px 12px;text-align:center;cursor:pointer;transition:.3s;color:#c9cdf5}
+#drop:hover,#drop.over{border-color:var(--ac);background:#ffffff0d;box-shadow:inset 0 0 30px var(--glow)}
+#drop b{display:block;font-size:30px;animation:fl 2.4s ease-in-out infinite}
+@keyframes fl{50%{transform:translateY(-6px)}}
+#info{font-size:13px;color:#aab0d8;margin-top:10px;min-height:18px}
+#err{color:#ff8a8a;font-size:13px;margin-top:6px}
+button.go{margin-top:14px;width:100%;padding:12px;border:0;border-radius:12px;font:inherit;font-weight:700;color:#07070f;background:linear-gradient(90deg,var(--ac),var(--ac2));cursor:pointer;box-shadow:0 0 24px var(--glow);transition:.3s}
+button.go:disabled{opacity:.35;cursor:not-allowed;box-shadow:none}
+.lb{margin-top:16px;display:grid;gap:10px}
+.row{font-size:13px}
+.row .t{display:flex;justify-content:space-between;margin-bottom:4px;color:#d7dafc}
+.bar{height:9px;border-radius:9px;background:#ffffff14;overflow:hidden}
+.bar i{display:block;height:100%;width:0;border-radius:9px;background:linear-gradient(90deg,var(--ac),var(--ac2));transition:width .6s}
+.row.run .bar i{background-size:200% 100%;background-image:repeating-linear-gradient(45deg,var(--ac) 0 8px,var(--ac2) 8px 16px);animation:mv .6s linear infinite}
+@keyframes mv{to{background-position:32px 0}}
+.row.win .t{color:#fff;font-weight:700;text-shadow:0 0 12px var(--ac)}
+fieldset{border:0;margin:0;padding:0;min-width:0}
+fieldset:disabled{opacity:.4}
+.f{display:grid;grid-template-columns:1fr 1fr;gap:10px 14px}
+@media(max-width:480px){.f{grid-template-columns:1fr}}
+label{font-size:12px;color:#aab0d8;display:block}
+label small{opacity:.7}
+input,select{width:100%;margin-top:4px;padding:10px 12px;font:inherit;font-size:16px;color:#fff;background:#0b0b1c99;border:1px solid #ffffff2a;border-radius:10px;outline:0;transition:.25s}
+input:focus,select:focus{border-color:var(--ac);box-shadow:0 0 0 3px var(--glow)}
+select option{color:#000}
+.gauge{position:relative;max-width:340px;margin:10px auto 0}
+.gauge svg{width:100%;display:block;overflow:visible}
+.gauge .arc{fill:none;stroke-width:14;stroke-linecap:round}
+#fill{stroke:url(#gg);stroke-dasharray:251.3;stroke-dashoffset:251.3;transition:stroke-dashoffset .9s cubic-bezier(.2,.8,.2,1);filter:drop-shadow(0 0 8px var(--ac))}
+.read{position:absolute;left:0;right:0;bottom:2px;text-align:center}
+#num{font-size:clamp(40px,9vw,60px);font-weight:800;line-height:1}
+.read span{display:block;font-size:12px;color:#aab0d8;letter-spacing:.14em}
+#tag{text-align:center;margin-top:10px;font-weight:700;color:var(--ac);min-height:24px}
+#hint{font-size:12px;color:#8e94c0;text-align:center;margin-top:4px;min-height:16px}
+</style>
+</head>
+<body>
+<canvas id="fx"></canvas>
+<main>
+<div class="steps"><span class="chip on" id="s1">1 · Upload</span><span class="chip" id="s2">2 · Train</span><span class="chip" id="s3">3 · Predict</span></div>
+<h1 id="title">MPG Studio</h1>
+<p class="sub" id="sub">Bundled dataset loads automatically — or drop in your own auto-mpg.csv to retrain.</p>
+<div class="grid">
+<div>
+<div class="card">
+<h2>Dataset</h2>
+<div id="drop"><b>⛽</b>Drag & drop auto-mpg.csv<br><small>or tap to browse</small></div>
+<input id="file" type="file" accept=".csv,text/csv" hidden>
+<div id="info"></div><div id="err"></div>
+<button class="go" id="train" disabled>Train &amp; compare models</button>
+<div class="lb" id="lb"></div>
+</div>
+</div>
+<div class="card">
+<h2>Live prediction</h2>
+<fieldset id="form" disabled>
+<div class="f">
+<label>Cylinders<input id="cylinders" type="number" step="any" inputmode="decimal"></label>
+<label>Engine displacement <small>(cu. in.)</small><input id="displacement" type="number" step="any" inputmode="decimal"></label>
+<label>Horsepower <small>(blank = auto-fill)</small><input id="horsepower" type="number" step="any" inputmode="decimal"></label>
+<label>Weight <small>(lbs)</small><input id="weight" type="number" step="any" inputmode="decimal"></label>
+<label>Acceleration <small>(sec)</small><input id="acceleration" type="number" step="any" inputmode="decimal"></label>
+<label>Model year <small>(e.g. 76)</small><input id="model_year" type="number" step="any" inputmode="decimal"></label>
+<label style="grid-column:1/-1">Origin<select id="origin"><option value="1">USA</option><option value="2">Europe</option><option value="3">Japan</option></select></label>
+</div>
+</fieldset>
+<div class="gauge">
+<svg viewBox="0 0 200 112"><defs><linearGradient id="gg"><stop offset="0" stop-color="#ff5b3a"/><stop offset=".5" stop-color="#ffc83a"/><stop offset="1" stop-color="#2dffb0"/></linearGradient></defs>
+<path class="arc" stroke="#ffffff18" d="M20 100 A80 80 0 0 1 180 100"/>
+<path class="arc" id="fill" d="M20 100 A80 80 0 0 1 180 100"/></svg>
+<div class="read"><div id="num">--</div><span>MILES PER GALLON</span></div>
+</div>
+<div id="tag"></div><div id="hint"></div>
+</div>
+</div>
+</main>
+<script>
+const $=s=>document.getElementById(s);
+const NUM=['cylinders','displacement','horsepower','weight','acceleration','model_year'];
+let rows=[],y=[],model=null,best='',stats={};
+
+/* ---------- ML-START ---------- */
+function rng(a){return()=>{a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+function parseCSV(t){const o=[];let r=[],f='',q=false;for(let i=0;i<t.length;i++){const c=t[i];
+if(q){if(c=='"'){if(t[i+1]=='"'){f+='"';i++}else q=false}else f+=c}
+else if(c=='"')q=true;else if(c==','){r.push(f);f=''}
+else if(c=='\n'||c=='\r'){if(c=='\r'&&t[i+1]=='\n')i++;r.push(f);o.push(r);r=[];f=''}else f+=c}
+if(f!==''||r.length){r.push(f);o.push(r)}return o.filter(r=>r.length>1)}
+function fitPrep(X){const med=[],mu=[],sd=[];
+for(let j=0;j<6;j++){const v=X.map(r=>r[j]).filter(Number.isFinite).sort((a,b)=>a-b);const n=v.length||1;
+med.push(v.length?v[v.length>>1]:0);const m=v.reduce((s,x)=>s+x,0)/n;mu.push(m);
+sd.push(Math.sqrt(v.reduce((s,x)=>s+(x-m)**2,0)/n)||1)}
+return r=>{const o=[];for(let j=0;j<6;j++){const x=Number.isFinite(r[j])?r[j]:med[j];o.push((x-mu[j])/sd[j])}
+for(let k=1;k<=3;k++)o.push(r[6]===k?1:0);return o}}
+function fitRidge(F,y,lam=1){const n=F.length,p=F[0].length+1;const A=Array.from({length:p},()=>new Array(p+1).fill(0));
+for(let i=0;i<n;i++){const x=[1,...F[i]];for(let a=0;a<p;a++){for(let b=0;b<p;b++)A[a][b]+=x[a]*x[b];A[a][p]+=x[a]*y[i]}}
+for(let a=1;a<p;a++)A[a][a]+=lam;
+for(let c=0;c<p;c++){let m=c;for(let r=c+1;r<p;r++)if(Math.abs(A[r][c])>Math.abs(A[m][c]))m=r;[A[c],A[m]]=[A[m],A[c]];
+for(let r=0;r<p;r++)if(r!=c){const f=A[r][c]/A[c][c];for(let k=c;k<=p;k++)A[r][k]-=f*A[c][k]}}
+const w=A.map((r,i)=>r[p]/r[i]);return x=>w[0]+x.reduce((s,v,i)=>s+v*w[i+1],0)}
+function fitKNN(F,y,k=5){return x=>{const d=F.map((f,i)=>[f.reduce((s,v,j)=>s+(v-x[j])**2,0),i]).sort((a,b)=>a[0]-b[0]).slice(0,k);
+return d.reduce((s,e)=>s+y[e[1]],0)/d.length}}
+function tree(F,y,idx,dep,maxD,minL,nf,rnd){const n=idx.length;let sum=0;for(const i of idx)sum+=y[i];const mean=sum/n;
+if(dep>=maxD||n<2*minL)return{v:mean};
+let fs=F[0].map((_,j)=>j);if(nf){fs=fs.sort(()=>rnd()-.5).slice(0,nf)}
+let best=null,bs=-Infinity;
+for(const j of fs){const s=idx.slice().sort((a,b)=>F[a][j]-F[b][j]);let ls=0;
+for(let t=0;t<n-1;t++){ls+=y[s[t]];const nl=t+1,nr=n-nl;
+if(nl<minL||nr<minL||F[s[t]][j]===F[s[t+1]][j])continue;
+const rs=sum-ls,sc=ls*ls/nl+rs*rs/nr;if(sc>bs){bs=sc;best={j,th:(F[s[t]][j]+F[s[t+1]][j])/2}}}}
+if(!best)return{v:mean};
+const L=[],R=[];for(const i of idx)(F[i][best.j]<=best.th?L:R).push(i);
+return{j:best.j,th:best.th,l:tree(F,y,L,dep+1,maxD,minL,nf,rnd),r:tree(F,y,R,dep+1,maxD,minL,nf,rnd)}}
+const pt=(t,x)=>{while(t.l)t=x[t.j]<=t.th?t.l:t.r;return t.v};
+function fitRF(F,y,rnd,T=50){const n=F.length,ts=[];
+for(let t=0;t<T;t++){const idx=Array.from({length:n},()=>rnd()*n|0);ts.push(tree(F,y,idx,0,9,2,3,rnd))}
+return x=>ts.reduce((s,t)=>s+pt(t,x),0)/T}
+function fitGB(F,y,rnd,T=100,lr=.1){const n=F.length,m0=y.reduce((a,b)=>a+b,0)/n,p=new Array(n).fill(m0),ts=[],all=[...Array(n).keys()];
+for(let t=0;t<T;t++){const res=y.map((v,i)=>v-p[i]);const tr=tree(F,res,all,0,3,3,0,rnd);ts.push(tr);for(let i=0;i<n;i++)p[i]+=lr*pt(tr,F[i])}
+return x=>m0+lr*ts.reduce((s,t)=>s+pt(t,x),0)}
+const ALGOS={'Ridge Regression':(F,y)=>fitRidge(F,y),'k-Nearest Neighbors':(F,y)=>fitKNN(F,y),'Random Forest':fitRF,'Gradient Boosting':fitGB};
+function fit(name,X,y,rnd){const prep=fitPrep(X),m=ALGOS[name](X.map(prep),y,rnd);return r=>m(prep(r))}
+function metrics(a,p){const n=a.length,mu=a.reduce((s,x)=>s+x,0)/n;let se=0,ae=0,st=0;
+for(let i=0;i<n;i++){const e=a[i]-p[i];se+=e*e;ae+=Math.abs(e);st+=(a[i]-mu)**2}
+return{rmse:Math.sqrt(se/n),mae:ae/n,r2:1-se/st}}
+/* ---------- ML-END ---------- */
+
+/* ---------- UI ---------- */
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+let hue=265,spd=1;
+function mood(h,s,ch){document.body.style.setProperty('--h',h);spd=s;if(ch)setChip(ch)}
+function setChip(n){[1,2,3].forEach(i=>$('s'+i).classList.toggle('on',i<=n))}
+function scramble(el,text){const ch='▮▯░▒▓#$%&*+=?',t0=performance.now();clearInterval(el._t);
+el._t=setInterval(()=>{const p=(performance.now()-t0)/650;
+el.textContent=[...text].map((c,i)=>c===' '||i<p*text.length?c:ch[Math.random()*ch.length|0]).join('');
+if(p>=1){el.textContent=text;clearInterval(el._t)}},35)}
+function head(t,s){scramble($('title'),t);$('sub').textContent=s}
+
+async function load(file){ingest(await file.text(),file.name)}
+function ingest(text,name){
+$('err').textContent='';
+try{const t=parseCSV(text);
+const h=t[0].map(x=>x.trim().toLowerCase().replace(/[\s-]+/g,'_'));
+const need=['mpg',...NUM,'origin'],ix=need.map(c=>h.indexOf(c));
+if(ix.includes(-1))throw new Error('Missing column(s): '+need.filter((c,i)=>ix[i]<0).join(', '));
+rows=[];y=[];let miss=0;
+for(const r of t.slice(1)){const v=ix.map(i=>parseFloat(r[i]));
+if(!Number.isFinite(v[0])||![1,2,3].includes(v[7]))continue;
+if(!Number.isFinite(v[3]))miss++;
+y.push(v[0]);rows.push([...v.slice(1,7),v[7]])}
+if(rows.length<30)throw new Error('Need at least 30 valid rows.');
+stats={};NUM.forEach((c,j)=>{const a=rows.map(r=>r[j]).filter(Number.isFinite).sort((p,q)=>p-q);stats[c]={min:a[0],max:a[a.length-1],med:a[a.length>>1]}});
+$('info').textContent=`✔ ${name}: ${rows.length} cars · ${miss} missing horsepower value(s) will be auto-filled`;
+$('train').disabled=false;$('lb').innerHTML='';model=null;$('form').disabled=true;
+mood(200,1.6,1);head('Dataset locked in','Now hit “Train & compare models”.')
+}catch(e){$('err').textContent=e.message;$('train').disabled=true}}
+
+async function train(){
+$('train').disabled=true;mood(190,5,2);head('Racing 4 models…','Cross-validating and tuning each one on your data.');
+const rnd=rng(42),n=rows.length,ord=[...Array(n).keys()].sort(()=>rnd()-.5),nt=Math.round(n*.2),te=ord.slice(0,nt),tr=ord.slice(nt);
+const names=Object.keys(ALGOS);$('lb').innerHTML=names.map((m,i)=>`<div class="row run" id="r${i}"><div class="t"><span>${m}</span><span id="v${i}">training…</span></div><div class="bar"><i id="b${i}"></i></div></div>`).join('');
+const res=[];
+for(let a=0;a<names.length;a++){const nm=names[a],ap=[],pp=[];
+for(let f=0;f<5;f++){$('b'+a).style.width=(f+1)*16+'%';await sleep(20);
+const va=tr.filter((_,i)=>i%5===f),tn=tr.filter((_,i)=>i%5!==f);
+const m=fit(nm,tn.map(i=>rows[i]),tn.map(i=>y[i]),rnd);va.forEach(i=>{ap.push(y[i]);pp.push(m(rows[i]))})}
+const cv=metrics(ap,pp).rmse;
+const m=fit(nm,tr.map(i=>rows[i]),tr.map(i=>y[i]),rnd),tm=metrics(te.map(i=>y[i]),te.map(i=>m(rows[i])));
+res.push({nm,cv,...tm});$('b'+a).style.width='100%';await sleep(20)}
+res.sort((p,q)=>p.cv-q.cv);best=res[0].nm;
+$('lb').innerHTML=res.map((r,i)=>`<div class="row ${i?'':'win'}"><div class="t"><span>${i?'':'👑 '}${r.nm}</span><span>CV RMSE ${r.cv.toFixed(2)} · R² ${r.r2.toFixed(3)}</span></div><div class="bar"><i style="width:${(res[0].cv/r.cv*100).toFixed(0)}%"></i></div></div>`).join('');
+model=fit(best,rows,y,rnd);
+NUM.forEach(c=>{const e=$(c);e.placeholder=stats[c].med;e.value=stats[c].med});
+$('form').disabled=false;$('train').disabled=false;burst();
+mood(150,2,3);head(best+' takes the crown','Type any value below — the gauge reacts instantly.');predict()}
+
+let shown=0;
+function predict(){if(!model)return;
+const r=NUM.map(c=>{const v=parseFloat($(c).value);return Number.isFinite(v)?v:NaN});r.push(+$('origin').value);
+const mpg=Math.max(4,Math.min(55,model(r)));
+$('fill').style.strokeDashoffset=251.3*(1-Math.min(mpg,50)/50);
+const from=shown,t0=performance.now();shown=mpg;
+(function tick(){const p=Math.min(1,(performance.now()-t0)/700);$('num').textContent=(from+(mpg-from)*(1-(1-p)**3)).toFixed(1);if(p<1)requestAnimationFrame(tick)})();
+const kml=mpg*0.4251;let m,h,s,tt;
+if(mpg<18){m='thirsty';h=12;s=7;tt='Thirsty beast'}else if(mpg<27){m='balanced';h=45;s=3;tt='Balanced cruiser'}else{m='eco';h=160;s=1.4;tt='Eco champion'}
+if(m!==predict.m){predict.m=m;mood(h,s,3);scramble($('title'),tt)}
+$('tag').textContent=`≈ ${kml.toFixed(1)} km/L`;
+$('hint').textContent=Number.isFinite(r[2])?'':'Horsepower left blank → filled with the dataset median.'}
+
+/* ---------- effects ---------- */
+const cv=$('fx'),cx=cv.getContext('2d');let W,H,P=[];
+function size(){W=cv.width=innerWidth;H=cv.height=innerHeight}size();addEventListener('resize',size);
+for(let i=0;i<70;i++)P.push({x:Math.random()*2000,y:Math.random()*1200,l:10+Math.random()*50,v:.4+Math.random()*1.2,a:.15+Math.random()*.4});
+let bursts=[];function burst(){for(let i=0;i<60;i++){const a=Math.random()*6.28,v=2+Math.random()*6;bursts.push({x:W/2,y:H/3,vx:Math.cos(a)*v,vy:Math.sin(a)*v,life:1})}}
+function frame(){cx.clearRect(0,0,W,H);const hh=parseFloat(getComputedStyle(document.body).getPropertyValue('--h'))||265;
+cx.lineCap='round';for(const p of P){p.x-=p.v*spd*3;if(p.x+p.l<0){p.x=W+Math.random()*100;p.y=Math.random()*H}
+cx.strokeStyle=`hsla(${hh},95%,65%,${p.a})`;cx.lineWidth=1.5;cx.beginPath();cx.moveTo(p.x,p.y);cx.lineTo(p.x+p.l*Math.min(spd,4),p.y);cx.stroke()}
+bursts=bursts.filter(b=>b.life>0);for(const b of bursts){b.x+=b.vx;b.y+=b.vy;b.vy+=.12;b.life-=.016;cx.fillStyle=`hsla(${hh+Math.random()*60},95%,65%,${b.life})`;cx.fillRect(b.x,b.y,4,4)}
+requestAnimationFrame(frame)}frame();
+
+/* ---------- wiring ---------- */
+const dz=$('drop');dz.onclick=()=>$('file').click();
+$('file').onchange=e=>e.target.files[0]&&load(e.target.files[0]);
+['dragenter','dragover'].forEach(v=>dz.addEventListener(v,e=>{e.preventDefault();dz.classList.add('over')}));
+['dragleave','drop'].forEach(v=>dz.addEventListener(v,e=>{e.preventDefault();dz.classList.remove('over')}));
+dz.addEventListener('drop',e=>e.dataTransfer.files[0]&&load(e.dataTransfer.files[0]));
+$('train').onclick=train;
+[...NUM,'origin'].forEach(c=>$(c).addEventListener('input',predict));
+mood(265,1,1);scramble($('title'),'MPG Studio');
+const BUNDLED="mpg,cylinders,displacement,horsepower,weight,acceleration,model year,origin,car name\n18,8,307,130,3504,12,70,1,chevrolet chevelle malibu\n15,8,350,165,3693,11.5,70,1,buick skylark 320\n18,8,318,150,3436,11,70,1,plymouth satellite\n16,8,304,150,3433,12,70,1,amc rebel sst\n17,8,302,140,3449,10.5,70,1,ford torino\n15,8,429,198,4341,10,70,1,ford galaxie 500\n14,8,454,220,4354,9,70,1,chevrolet impala\n14,8,440,215,4312,8.5,70,1,plymouth fury iii\n14,8,455,225,4425,10,70,1,pontiac catalina\n15,8,390,190,3850,8.5,70,1,amc ambassador dpl\n15,8,383,170,3563,10,70,1,dodge challenger se\n14,8,340,160,3609,8,70,1,plymouth 'cuda 340\n15,8,400,150,3761,9.5,70,1,chevrolet monte carlo\n14,8,455,225,3086,10,70,1,buick estate wagon (sw)\n24,4,113,95,2372,15,70,3,toyota corona mark ii\n22,6,198,95,2833,15.5,70,1,plymouth duster\n18,6,199,97,2774,15.5,70,1,amc hornet\n21,6,200,85,2587,16,70,1,ford maverick\n27,4,97,88,2130,14.5,70,3,datsun pl510\n26,4,97,46,1835,20.5,70,2,volkswagen 1131 deluxe sedan\n25,4,110,87,2672,17.5,70,2,peugeot 504\n24,4,107,90,2430,14.5,70,2,audi 100 ls\n25,4,104,95,2375,17.5,70,2,saab 99e\n26,4,121,113,2234,12.5,70,2,bmw 2002\n21,6,199,90,2648,15,70,1,amc gremlin\n10,8,360,215,4615,14,70,1,ford f250\n10,8,307,200,4376,15,70,1,chevy c20\n11,8,318,210,4382,13.5,70,1,dodge d200\n9,8,304,193,4732,18.5,70,1,hi 1200d\n27,4,97,88,2130,14.5,71,3,datsun pl510\n28,4,140,90,2264,15.5,71,1,chevrolet vega 2300\n25,4,113,95,2228,14,71,3,toyota corona\n25,4,98,?,2046,19,71,1,ford pinto\n19,6,232,100,2634,13,71,1,amc gremlin\n16,6,225,105,3439,15.5,71,1,plymouth satellite custom\n17,6,250,100,3329,15.5,71,1,chevrolet chevelle malibu\n19,6,250,88,3302,15.5,71,1,ford torino 500\n18,6,232,100,3288,15.5,71,1,amc matador\n14,8,350,165,4209,12,71,1,chevrolet impala\n14,8,400,175,4464,11.5,71,1,pontiac catalina brougham\n14,8,351,153,4154,13.5,71,1,ford galaxie 500\n14,8,318,150,4096,13,71,1,plymouth fury iii\n12,8,383,180,4955,11.5,71,1,dodge monaco (sw)\n13,8,400,170,4746,12,71,1,ford country squire (sw)\n13,8,400,175,5140,12,71,1,pontiac safari (sw)\n18,6,258,110,2962,13.5,71,1,amc hornet sportabout (sw)\n22,4,140,72,2408,19,71,1,chevrolet vega (sw)\n19,6,250,100,3282,15,71,1,pontiac firebird\n18,6,250,88,3139,14.5,71,1,ford mustang\n23,4,122,86,2220,14,71,1,mercury capri 2000\n28,4,116,90,2123,14,71,2,opel 1900\n30,4,79,70,2074,19.5,71,2,peugeot 304\n30,4,88,76,2065,14.5,71,2,fiat 124b\n31,4,71,65,1773,19,71,3,toyota corolla 1200\n35,4,72,69,1613,18,71,3,datsun 1200\n27,4,97,60,1834,19,71,2,volkswagen model 111\n26,4,91,70,1955,20.5,71,1,plymouth cricket\n24,4,113,95,2278,15.5,72,3,toyota corona hardtop\n25,4,97.5,80,2126,17,72,1,dodge colt hardtop\n23,4,97,54,2254,23.5,72,2,volkswagen type 3\n20,4,140,90,2408,19.5,72,1,chevrolet vega\n21,4,122,86,2226,16.5,72,1,ford pinto runabout\n13,8,350,165,4274,12,72,1,chevrolet impala\n14,8,400,175,4385,12,72,1,pontiac catalina\n15,8,318,150,4135,13.5,72,1,plymouth fury iii\n14,8,351,153,4129,13,72,1,ford galaxie 500\n17,8,304,150,3672,11.5,72,1,amc ambassador sst\n11,8,429,208,4633,11,72,1,mercury marquis\n13,8,350,155,4502,13.5,72,1,buick lesabre custom\n12,8,350,160,4456,13.5,72,1,oldsmobile delta 88 royale\n13,8,400,190,4422,12.5,72,1,chrysler newport royal\n19,3,70,97,2330,13.5,72,3,mazda rx2 coupe\n15,8,304,150,3892,12.5,72,1,amc matador (sw)\n13,8,307,130,4098,14,72,1,chevrolet chevelle concours (sw)\n13,8,302,140,4294,16,72,1,ford gran torino (sw)\n14,8,318,150,4077,14,72,1,plymouth satellite custom (sw)\n18,4,121,112,2933,14.5,72,2,volvo 145e (sw)\n22,4,121,76,2511,18,72,2,volkswagen 411 (sw)\n21,4,120,87,2979,19.5,72,2,peugeot 504 (sw)\n26,4,96,69,2189,18,72,2,renault 12 (sw)\n22,4,122,86,2395,16,72,1,ford pinto (sw)\n28,4,97,92,2288,17,72,3,datsun 510 (sw)\n23,4,120,97,2506,14.5,72,3,toyouta corona mark ii (sw)\n28,4,98,80,2164,15,72,1,dodge colt (sw)\n27,4,97,88,2100,16.5,72,3,toyota corolla 1600 (sw)\n13,8,350,175,4100,13,73,1,buick century 350\n14,8,304,150,3672,11.5,73,1,amc matador\n13,8,350,145,3988,13,73,1,chevrolet malibu\n14,8,302,137,4042,14.5,73,1,ford gran torino\n15,8,318,150,3777,12.5,73,1,dodge coronet custom\n12,8,429,198,4952,11.5,73,1,mercury marquis brougham\n13,8,400,150,4464,12,73,1,chevrolet caprice classic\n13,8,351,158,4363,13,73,1,ford ltd\n14,8,318,150,4237,14.5,73,1,plymouth fury gran sedan\n13,8,440,215,4735,11,73,1,chrysler new yorker brougham\n12,8,455,225,4951,11,73,1,buick electra 225 custom\n13,8,360,175,3821,11,73,1,amc ambassador brougham\n18,6,225,105,3121,16.5,73,1,plymouth valiant\n16,6,250,100,3278,18,73,1,chevrolet nova custom\n18,6,232,100,2945,16,73,1,amc hornet\n18,6,250,88,3021,16.5,73,1,ford maverick\n23,6,198,95,2904,16,73,1,plymouth duster\n26,4,97,46,1950,21,73,2,volkswagen super beetle\n11,8,400,150,4997,14,73,1,chevrolet impala\n12,8,400,167,4906,12.5,73,1,ford country\n13,8,360,170,4654,13,73,1,plymouth custom suburb\n12,8,350,180,4499,12.5,73,1,oldsmobile vista cruiser\n18,6,232,100,2789,15,73,1,amc gremlin\n20,4,97,88,2279,19,73,3,toyota carina\n21,4,140,72,2401,19.5,73,1,chevrolet vega\n22,4,108,94,2379,16.5,73,3,datsun 610\n18,3,70,90,2124,13.5,73,3,maxda rx3\n19,4,122,85,2310,18.5,73,1,ford pinto\n21,6,155,107,2472,14,73,1,mercury capri v6\n26,4,98,90,2265,15.5,73,2,fiat 124 sport coupe\n15,8,350,145,4082,13,73,1,chevrolet monte carlo s\n16,8,400,230,4278,9.5,73,1,pontiac grand prix\n29,4,68,49,1867,19.5,73,2,fiat 128\n24,4,116,75,2158,15.5,73,2,opel manta\n20,4,114,91,2582,14,73,2,audi 100ls\n19,4,121,112,2868,15.5,73,2,volvo 144ea\n15,8,318,150,3399,11,73,1,dodge dart custom\n24,4,121,110,2660,14,73,2,saab 99le\n20,6,156,122,2807,13.5,73,3,toyota mark ii\n11,8,350,180,3664,11,73,1,oldsmobile omega\n20,6,198,95,3102,16.5,74,1,plymouth duster\n21,6,200,?,2875,17,74,1,ford maverick\n19,6,232,100,2901,16,74,1,amc hornet\n15,6,250,100,3336,17,74,1,chevrolet nova\n31,4,79,67,1950,19,74,3,datsun b210\n26,4,122,80,2451,16.5,74,1,ford pinto\n32,4,71,65,1836,21,74,3,toyota corolla 1200\n25,4,140,75,2542,17,74,1,chevrolet vega\n16,6,250,100,3781,17,74,1,chevrolet chevelle malibu classic\n16,6,258,110,3632,18,74,1,amc matador\n18,6,225,105,3613,16.5,74,1,plymouth satellite sebring\n16,8,302,140,4141,14,74,1,ford gran torino\n13,8,350,150,4699,14.5,74,1,buick century luxus (sw)\n14,8,318,150,4457,13.5,74,1,dodge coronet custom (sw)\n14,8,302,140,4638,16,74,1,ford gran torino (sw)\n14,8,304,150,4257,15.5,74,1,amc matador (sw)\n29,4,98,83,2219,16.5,74,2,audi fox\n26,4,79,67,1963,15.5,74,2,volkswagen dasher\n26,4,97,78,2300,14.5,74,2,opel manta\n31,4,76,52,1649,16.5,74,3,toyota corona\n32,4,83,61,2003,19,74,3,datsun 710\n28,4,90,75,2125,14.5,74,1,dodge colt\n24,4,90,75,2108,15.5,74,2,fiat 128\n26,4,116,75,2246,14,74,2,fiat 124 tc\n24,4,120,97,2489,15,74,3,honda civic\n26,4,108,93,2391,15.5,74,3,subaru\n31,4,79,67,2000,16,74,2,fiat x1.9\n19,6,225,95,3264,16,75,1,plymouth valiant custom\n18,6,250,105,3459,16,75,1,chevrolet nova\n15,6,250,72,3432,21,75,1,mercury monarch\n15,6,250,72,3158,19.5,75,1,ford maverick\n16,8,400,170,4668,11.5,75,1,pontiac catalina\n15,8,350,145,4440,14,75,1,chevrolet bel air\n16,8,318,150,4498,14.5,75,1,plymouth grand fury\n14,8,351,148,4657,13.5,75,1,ford ltd\n17,6,231,110,3907,21,75,1,buick century\n16,6,250,105,3897,18.5,75,1,chevroelt chevelle malibu\n15,6,258,110,3730,19,75,1,amc matador\n18,6,225,95,3785,19,75,1,plymouth fury\n21,6,231,110,3039,15,75,1,buick skyhawk\n20,8,262,110,3221,13.5,75,1,chevrolet monza 2+2\n13,8,302,129,3169,12,75,1,ford mustang ii\n29,4,97,75,2171,16,75,3,toyota corolla\n23,4,140,83,2639,17,75,1,ford pinto\n20,6,232,100,2914,16,75,1,amc gremlin\n23,4,140,78,2592,18.5,75,1,pontiac astro\n24,4,134,96,2702,13.5,75,3,toyota corona\n25,4,90,71,2223,16.5,75,2,volkswagen dasher\n24,4,119,97,2545,17,75,3,datsun 710\n18,6,171,97,2984,14.5,75,1,ford pinto\n29,4,90,70,1937,14,75,2,volkswagen rabbit\n19,6,232,90,3211,17,75,1,amc pacer\n23,4,115,95,2694,15,75,2,audi 100ls\n23,4,120,88,2957,17,75,2,peugeot 504\n22,4,121,98,2945,14.5,75,2,volvo 244dl\n25,4,121,115,2671,13.5,75,2,saab 99le\n33,4,91,53,1795,17.5,75,3,honda civic cvcc\n28,4,107,86,2464,15.5,76,2,fiat 131\n25,4,116,81,2220,16.9,76,2,opel 1900\n25,4,140,92,2572,14.9,76,1,capri ii\n26,4,98,79,2255,17.7,76,1,dodge colt\n27,4,101,83,2202,15.3,76,2,renault 12tl\n17.5,8,305,140,4215,13,76,1,chevrolet chevelle malibu classic\n16,8,318,150,4190,13,76,1,dodge coronet brougham\n15.5,8,304,120,3962,13.9,76,1,amc matador\n14.5,8,351,152,4215,12.8,76,1,ford gran torino\n22,6,225,100,3233,15.4,76,1,plymouth valiant\n22,6,250,105,3353,14.5,76,1,chevrolet nova\n24,6,200,81,3012,17.6,76,1,ford maverick\n22.5,6,232,90,3085,17.6,76,1,amc hornet\n29,4,85,52,2035,22.2,76,1,chevrolet chevette\n24.5,4,98,60,2164,22.1,76,1,chevrolet woody\n29,4,90,70,1937,14.2,76,2,vw rabbit\n33,4,91,53,1795,17.4,76,3,honda civic\n20,6,225,100,3651,17.7,76,1,dodge aspen se\n18,6,250,78,3574,21,76,1,ford granada ghia\n18.5,6,250,110,3645,16.2,76,1,pontiac ventura sj\n17.5,6,258,95,3193,17.8,76,1,amc pacer d/l\n29.5,4,97,71,1825,12.2,76,2,volkswagen rabbit\n32,4,85,70,1990,17,76,3,datsun b-210\n28,4,97,75,2155,16.4,76,3,toyota corolla\n26.5,4,140,72,2565,13.6,76,1,ford pinto\n20,4,130,102,3150,15.7,76,2,volvo 245\n13,8,318,150,3940,13.2,76,1,plymouth volare premier v8\n19,4,120,88,3270,21.9,76,2,peugeot 504\n19,6,156,108,2930,15.5,76,3,toyota mark ii\n16.5,6,168,120,3820,16.7,76,2,mercedes-benz 280s\n16.5,8,350,180,4380,12.1,76,1,cadillac seville\n13,8,350,145,4055,12,76,1,chevy c10\n13,8,302,130,3870,15,76,1,ford f108\n13,8,318,150,3755,14,76,1,dodge d100\n31.5,4,98,68,2045,18.5,77,3,honda accord cvcc\n30,4,111,80,2155,14.8,77,1,buick opel isuzu deluxe\n36,4,79,58,1825,18.6,77,2,renault 5 gtl\n25.5,4,122,96,2300,15.5,77,1,plymouth arrow gs\n33.5,4,85,70,1945,16.8,77,3,datsun f-10 hatchback\n17.5,8,305,145,3880,12.5,77,1,chevrolet caprice classic\n17,8,260,110,4060,19,77,1,oldsmobile cutlass supreme\n15.5,8,318,145,4140,13.7,77,1,dodge monaco brougham\n15,8,302,130,4295,14.9,77,1,mercury cougar brougham\n17.5,6,250,110,3520,16.4,77,1,chevrolet concours\n20.5,6,231,105,3425,16.9,77,1,buick skylark\n19,6,225,100,3630,17.7,77,1,plymouth volare custom\n18.5,6,250,98,3525,19,77,1,ford granada\n16,8,400,180,4220,11.1,77,1,pontiac grand prix lj\n15.5,8,350,170,4165,11.4,77,1,chevrolet monte carlo landau\n15.5,8,400,190,4325,12.2,77,1,chrysler cordoba\n16,8,351,149,4335,14.5,77,1,ford thunderbird\n29,4,97,78,1940,14.5,77,2,volkswagen rabbit custom\n24.5,4,151,88,2740,16,77,1,pontiac sunbird coupe\n26,4,97,75,2265,18.2,77,3,toyota corolla liftback\n25.5,4,140,89,2755,15.8,77,1,ford mustang ii 2+2\n30.5,4,98,63,2051,17,77,1,chevrolet chevette\n33.5,4,98,83,2075,15.9,77,1,dodge colt m/m\n30,4,97,67,1985,16.4,77,3,subaru dl\n30.5,4,97,78,2190,14.1,77,2,volkswagen dasher\n22,6,146,97,2815,14.5,77,3,datsun 810\n21.5,4,121,110,2600,12.8,77,2,bmw 320i\n21.5,3,80,110,2720,13.5,77,3,mazda rx-4\n43.1,4,90,48,1985,21.5,78,2,volkswagen rabbit custom diesel\n36.1,4,98,66,1800,14.4,78,1,ford fiesta\n32.8,4,78,52,1985,19.4,78,3,mazda glc deluxe\n39.4,4,85,70,2070,18.6,78,3,datsun b210 gx\n36.1,4,91,60,1800,16.4,78,3,honda civic cvcc\n19.9,8,260,110,3365,15.5,78,1,oldsmobile cutlass salon brougham\n19.4,8,318,140,3735,13.2,78,1,dodge diplomat\n20.2,8,302,139,3570,12.8,78,1,mercury monarch ghia\n19.2,6,231,105,3535,19.2,78,1,pontiac phoenix lj\n20.5,6,200,95,3155,18.2,78,1,chevrolet malibu\n20.2,6,200,85,2965,15.8,78,1,ford fairmont (auto)\n25.1,4,140,88,2720,15.4,78,1,ford fairmont (man)\n20.5,6,225,100,3430,17.2,78,1,plymouth volare\n19.4,6,232,90,3210,17.2,78,1,amc concord\n20.6,6,231,105,3380,15.8,78,1,buick century special\n20.8,6,200,85,3070,16.7,78,1,mercury zephyr\n18.6,6,225,110,3620,18.7,78,1,dodge aspen\n18.1,6,258,120,3410,15.1,78,1,amc concord d/l\n19.2,8,305,145,3425,13.2,78,1,chevrolet monte carlo landau\n17.7,6,231,165,3445,13.4,78,1,buick regal sport coupe (turbo)\n18.1,8,302,139,3205,11.2,78,1,ford futura\n17.5,8,318,140,4080,13.7,78,1,dodge magnum xe\n30,4,98,68,2155,16.5,78,1,chevrolet chevette\n27.5,4,134,95,2560,14.2,78,3,toyota corona\n27.2,4,119,97,2300,14.7,78,3,datsun 510\n30.9,4,105,75,2230,14.5,78,1,dodge omni\n21.1,4,134,95,2515,14.8,78,3,toyota celica gt liftback\n23.2,4,156,105,2745,16.7,78,1,plymouth sapporo\n23.8,4,151,85,2855,17.6,78,1,oldsmobile starfire sx\n23.9,4,119,97,2405,14.9,78,3,datsun 200-sx\n20.3,5,131,103,2830,15.9,78,2,audi 5000\n17,6,163,125,3140,13.6,78,2,volvo 264gl\n21.6,4,121,115,2795,15.7,78,2,saab 99gle\n16.2,6,163,133,3410,15.8,78,2,peugeot 604sl\n31.5,4,89,71,1990,14.9,78,2,volkswagen scirocco\n29.5,4,98,68,2135,16.6,78,3,honda accord lx\n21.5,6,231,115,3245,15.4,79,1,pontiac lemans v6\n19.8,6,200,85,2990,18.2,79,1,mercury zephyr 6\n22.3,4,140,88,2890,17.3,79,1,ford fairmont 4\n20.2,6,232,90,3265,18.2,79,1,amc concord dl 6\n20.6,6,225,110,3360,16.6,79,1,dodge aspen 6\n17,8,305,130,3840,15.4,79,1,chevrolet caprice classic\n17.6,8,302,129,3725,13.4,79,1,ford ltd landau\n16.5,8,351,138,3955,13.2,79,1,mercury grand marquis\n18.2,8,318,135,3830,15.2,79,1,dodge st. regis\n16.9,8,350,155,4360,14.9,79,1,buick estate wagon (sw)\n15.5,8,351,142,4054,14.3,79,1,ford country squire (sw)\n19.2,8,267,125,3605,15,79,1,chevrolet malibu classic (sw)\n18.5,8,360,150,3940,13,79,1,chrysler lebaron town @ country (sw)\n31.9,4,89,71,1925,14,79,2,vw rabbit custom\n34.1,4,86,65,1975,15.2,79,3,maxda glc deluxe\n35.7,4,98,80,1915,14.4,79,1,dodge colt hatchback custom\n27.4,4,121,80,2670,15,79,1,amc spirit dl\n25.4,5,183,77,3530,20.1,79,2,mercedes benz 300d\n23,8,350,125,3900,17.4,79,1,cadillac eldorado\n27.2,4,141,71,3190,24.8,79,2,peugeot 504\n23.9,8,260,90,3420,22.2,79,1,oldsmobile cutlass salon brougham\n34.2,4,105,70,2200,13.2,79,1,plymouth horizon\n34.5,4,105,70,2150,14.9,79,1,plymouth horizon tc3\n31.8,4,85,65,2020,19.2,79,3,datsun 210\n37.3,4,91,69,2130,14.7,79,2,fiat strada custom\n28.4,4,151,90,2670,16,79,1,buick skylark limited\n28.8,6,173,115,2595,11.3,79,1,chevrolet citation\n26.8,6,173,115,2700,12.9,79,1,oldsmobile omega brougham\n33.5,4,151,90,2556,13.2,79,1,pontiac phoenix\n41.5,4,98,76,2144,14.7,80,2,vw rabbit\n38.1,4,89,60,1968,18.8,80,3,toyota corolla tercel\n32.1,4,98,70,2120,15.5,80,1,chevrolet chevette\n37.2,4,86,65,2019,16.4,80,3,datsun 310\n28,4,151,90,2678,16.5,80,1,chevrolet citation\n26.4,4,140,88,2870,18.1,80,1,ford fairmont\n24.3,4,151,90,3003,20.1,80,1,amc concord\n19.1,6,225,90,3381,18.7,80,1,dodge aspen\n34.3,4,97,78,2188,15.8,80,2,audi 4000\n29.8,4,134,90,2711,15.5,80,3,toyota corona liftback\n31.3,4,120,75,2542,17.5,80,3,mazda 626\n37,4,119,92,2434,15,80,3,datsun 510 hatchback\n32.2,4,108,75,2265,15.2,80,3,toyota corolla\n46.6,4,86,65,2110,17.9,80,3,mazda glc\n27.9,4,156,105,2800,14.4,80,1,dodge colt\n40.8,4,85,65,2110,19.2,80,3,datsun 210\n44.3,4,90,48,2085,21.7,80,2,vw rabbit c (diesel)\n43.4,4,90,48,2335,23.7,80,2,vw dasher (diesel)\n36.4,5,121,67,2950,19.9,80,2,audi 5000s (diesel)\n30,4,146,67,3250,21.8,80,2,mercedes-benz 240d\n44.6,4,91,67,1850,13.8,80,3,honda civic 1500 gl\n40.9,4,85,?,1835,17.3,80,2,renault lecar deluxe\n33.8,4,97,67,2145,18,80,3,subaru dl\n29.8,4,89,62,1845,15.3,80,2,vokswagen rabbit\n32.7,6,168,132,2910,11.4,80,3,datsun 280-zx\n23.7,3,70,100,2420,12.5,80,3,mazda rx-7 gs\n35,4,122,88,2500,15.1,80,2,triumph tr7 coupe\n23.6,4,140,?,2905,14.3,80,1,ford mustang cobra\n32.4,4,107,72,2290,17,80,3,honda accord\n27.2,4,135,84,2490,15.7,81,1,plymouth reliant\n26.6,4,151,84,2635,16.4,81,1,buick skylark\n25.8,4,156,92,2620,14.4,81,1,dodge aries wagon (sw)\n23.5,6,173,110,2725,12.6,81,1,chevrolet citation\n30,4,135,84,2385,12.9,81,1,plymouth reliant\n39.1,4,79,58,1755,16.9,81,3,toyota starlet\n39,4,86,64,1875,16.4,81,1,plymouth champ\n35.1,4,81,60,1760,16.1,81,3,honda civic 1300\n32.3,4,97,67,2065,17.8,81,3,subaru\n37,4,85,65,1975,19.4,81,3,datsun 210 mpg\n37.7,4,89,62,2050,17.3,81,3,toyota tercel\n34.1,4,91,68,1985,16,81,3,mazda glc 4\n34.7,4,105,63,2215,14.9,81,1,plymouth horizon 4\n34.4,4,98,65,2045,16.2,81,1,ford escort 4w\n29.9,4,98,65,2380,20.7,81,1,ford escort 2h\n33,4,105,74,2190,14.2,81,2,volkswagen jetta\n34.5,4,100,?,2320,15.8,81,2,renault 18i\n33.7,4,107,75,2210,14.4,81,3,honda prelude\n32.4,4,108,75,2350,16.8,81,3,toyota corolla\n32.9,4,119,100,2615,14.8,81,3,datsun 200sx\n31.6,4,120,74,2635,18.3,81,3,mazda 626\n28.1,4,141,80,3230,20.4,81,2,peugeot 505s turbo diesel\n30.7,6,145,76,3160,19.6,81,2,volvo diesel\n25.4,6,168,116,2900,12.6,81,3,toyota cressida\n24.2,6,146,120,2930,13.8,81,3,datsun 810 maxima\n22.4,6,231,110,3415,15.8,81,1,buick century\n26.6,8,350,105,3725,19,81,1,oldsmobile cutlass ls\n20.2,6,200,88,3060,17.1,81,1,ford granada gl\n17.6,6,225,85,3465,16.6,81,1,chrysler lebaron salon\n28,4,112,88,2605,19.6,82,1,chevrolet cavalier\n27,4,112,88,2640,18.6,82,1,chevrolet cavalier wagon\n34,4,112,88,2395,18,82,1,chevrolet cavalier 2-door\n31,4,112,85,2575,16.2,82,1,pontiac j2000 se hatchback\n29,4,135,84,2525,16,82,1,dodge aries se\n27,4,151,90,2735,18,82,1,pontiac phoenix\n24,4,140,92,2865,16.4,82,1,ford fairmont futura\n23,4,151,?,3035,20.5,82,1,amc concord dl\n36,4,105,74,1980,15.3,82,2,volkswagen rabbit l\n37,4,91,68,2025,18.2,82,3,mazda glc custom l\n31,4,91,68,1970,17.6,82,3,mazda glc custom\n38,4,105,63,2125,14.7,82,1,plymouth horizon miser\n36,4,98,70,2125,17.3,82,1,mercury lynx l\n36,4,120,88,2160,14.5,82,3,nissan stanza xe\n36,4,107,75,2205,14.5,82,3,honda accord\n34,4,108,70,2245,16.9,82,3,toyota corolla\n38,4,91,67,1965,15,82,3,honda civic\n32,4,91,67,1965,15.7,82,3,honda civic (auto)\n38,4,91,67,1995,16.2,82,3,datsun 310 gx\n25,6,181,110,2945,16.4,82,1,buick century limited\n38,6,262,85,3015,17,82,1,oldsmobile cutlass ciera (diesel)\n26,4,156,92,2585,14.5,82,1,chrysler lebaron medallion\n22,6,232,112,2835,14.7,82,1,ford granada l\n32,4,144,96,2665,13.9,82,3,toyota celica gt\n36,4,135,84,2370,13,82,1,dodge charger 2.2\n27,4,151,90,2950,17.3,82,1,chevrolet camaro\n27,4,140,86,2790,15.6,82,1,ford mustang gl\n44,4,97,52,2130,24.6,82,2,vw pickup\n32,4,135,84,2295,11.6,82,1,dodge rampage\n28,4,120,79,2625,18.6,82,1,ford ranger\n31,4,119,82,2720,19.4,82,1,chevy s-10\n";
+setTimeout(()=>{ingest(BUNDLED,'auto-mpg.csv (bundled)');if(rows.length)train()},700);
+</script>
+</body>
+</html>
